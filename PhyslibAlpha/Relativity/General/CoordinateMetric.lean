@@ -33,6 +33,7 @@ componentwise.
 ## ii. Key results
 
 - `IsLorentzianMetricOn` : the metric field is symmetric, smooth and Lorentzian on an open set.
+- `isLorentzian_diagonal_four` : a diagonal matrix of signs `(-,+,+,+)` is Lorentzian.
 - `IsLorentzianMetricOn.det_ne_zero` : a Lorentzian metric is non-degenerate.
 - `christoffel` : the Christoffel symbols of the second kind.
 - `christoffel_symm` : `Γ^a_{bc} = Γ^a_{cb}`.
@@ -93,6 +94,36 @@ lemma IsLorentzian.det_ne_zero {G : Matrix (Fin 4) (Fin 4) ℝ}
   have h3 : Matrix.toBilin' G v v = 0 := by
     simp [Matrix.toBilin'_apply', hGv]
   linarith
+
+/-- A diagonal matrix with entries of signs `(-,+,+,+)` is Lorentzian. -/
+lemma isLorentzian_diagonal_four {w : Fin 4 → ℝ} (h0 : w 0 < 0) (h1 : 0 < w 1) (h2 : 0 < w 2)
+    (h3 : 0 < w 3) : IsLorentzian (Matrix.toBilin' (Matrix.diagonal w)) := by
+  have hb : ∀ v u : Fin 4 → ℝ, Matrix.toBilin' (Matrix.diagonal w) v u
+      = w 0 * (v 0 * u 0) + w 1 * (v 1 * u 1) + w 2 * (v 2 * u 2) + w 3 * (v 3 * u 3) := by
+    intro v u
+    simp [Matrix.toBilin'_apply', dotProduct, Matrix.mulVec_diagonal, Fin.sum_univ_four]
+    ring
+  refine ⟨fun v u => by simp only [hb]; ring, Pi.single 0 1, ?_, fun v h hv => ?_⟩
+  · rw [hb]; simpa using h0
+  · simp only [hb, Pi.single_apply] at h
+    simp at h
+    have hv0 : v 0 = 0 := by
+      rcases h with h | h
+      · exact absurd h h0.ne
+      · exact h
+    have hne : v 1 ≠ 0 ∨ v 2 ≠ 0 ∨ v 3 ≠ 0 := by
+      by_contra hcon
+      simp only [not_or, not_not] at hcon
+      refine hv (funext fun i => ?_)
+      fin_cases i <;> simp [hv0, hcon]
+    rw [hb, hv0]
+    have a1 := mul_nonneg h1.le (mul_self_nonneg (v 1))
+    have a2 := mul_nonneg h2.le (mul_self_nonneg (v 2))
+    have a3 := mul_nonneg h3.le (mul_self_nonneg (v 3))
+    rcases hne with h' | h' | h'
+    · have := mul_pos h1 (mul_self_pos.2 h'); simp; linarith
+    · have := mul_pos h2 (mul_self_pos.2 h'); simp; linarith
+    · have := mul_pos h3 (mul_self_pos.2 h'); simp; linarith
 
 /-- A Lorentzian metric field is non-degenerate at every point of its domain. -/
 lemma IsLorentzianMetricOn.det_ne_zero {g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ}

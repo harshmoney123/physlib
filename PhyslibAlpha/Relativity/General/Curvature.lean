@@ -41,6 +41,8 @@ cyclicity of the trace together with the symmetry of second derivatives of `g`.
 - `riemann_antisymm` : `R^a_{bcd} = -R^a_{bdc}`.
 - `ricci_symm` : the Ricci tensor of a Lorentzian metric field is symmetric.
 - `einstein_symm` : the Einstein tensor of a Lorentzian metric field is symmetric.
+- `coordDeriv_comp_proj`, `coordDeriv_proj_mul` : coordinate derivatives of functions of single
+  coordinates, used for metrics depending on few coordinates.
 - `riemann_const`, `ricci_const`, `ricciScalar_const`, `einstein_const` : all of them vanish for a
   constant metric.
 
@@ -194,6 +196,27 @@ lemma coordDeriv_comm (hf : ContDiffAt ℝ ∞ f x) (b d : Fin 4) :
   rw [fderiv_clm_apply hd (differentiableAt_const _),
     fderiv_clm_apply hd (differentiableAt_const _)]
   simp [hs.eq (Pi.single b 1) (Pi.single d 1)]
+
+/-- The coordinate derivative of a function of a single coordinate `x i`. -/
+lemma coordDeriv_comp_proj {A : ℝ → ℝ} (i : Fin 4) (hA : DifferentiableAt ℝ A (x i)) (b : Fin 4) :
+    coordDeriv (fun y => A (y i)) x b = if b = i then deriv A (x i) else 0 := by
+  have h := hA.hasDerivAt.hasFDerivAt.comp x
+    (ContinuousLinearMap.proj (R := ℝ) (φ := fun _ : Fin 4 => ℝ) i).hasFDerivAt
+  have h2 : fderiv ℝ (fun y : Fin 4 → ℝ => A (y i)) x = _ := h.fderiv
+  simp only [coordDeriv, h2]
+  by_cases hb : b = i <;> simp [hb]
+
+/-- The coordinate derivative of a product of a function of `x i` and a function of `x j`. -/
+lemma coordDeriv_proj_mul {A B : ℝ → ℝ} (i j : Fin 4) (hA : DifferentiableAt ℝ A (x i))
+    (hB : DifferentiableAt ℝ B (x j)) (b : Fin 4) :
+    coordDeriv (fun y => A (y i) * B (y j)) x b
+      = (if b = i then deriv A (x i) else 0) * B (x j)
+        + A (x i) * (if b = j then deriv B (x j) else 0) := by
+  have hA' : DifferentiableAt ℝ (fun y : Fin 4 → ℝ => A (y i)) x :=
+    hA.comp x (differentiableAt_apply i x)
+  have hB' : DifferentiableAt ℝ (fun y : Fin 4 → ℝ => B (y j)) x :=
+    hB.comp x (differentiableAt_apply j x)
+  rw [coordDeriv_mul hA' hB', coordDeriv_comp_proj i hA, coordDeriv_comp_proj j hB]
 
 end Calculus
 
