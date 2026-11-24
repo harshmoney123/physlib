@@ -821,6 +821,9 @@ public import PhyslibAlpha.Relativity.General.Godel.Metric
 public import PhyslibAlpha.Relativity.General.MorrisThorne.Einstein
 public import PhyslibAlpha.Relativity.General.MorrisThorne.Metric
 public import PhyslibAlpha.Relativity.General.MorrisThorne.NullEnergyCondition
+public import PhyslibAlpha.Relativity.General.MorrisThorne.RedshiftMetric
+public import PhyslibAlpha.Relativity.General.MorrisThorne.RedshiftNullEnergyCondition
+public import PhyslibAlpha.Relativity.General.MorrisThorne.RedshiftRicci
 public import PhyslibAlpha.Relativity.General.PerfectFluidEnergyConditions
 public import PhyslibAlpha.Relativity.General.PointwiseCausality
 public import PhyslibAlpha.Relativity.General.Schwarzschild.IncompressibleSphere
