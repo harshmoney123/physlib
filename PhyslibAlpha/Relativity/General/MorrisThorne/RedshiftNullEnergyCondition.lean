@@ -102,12 +102,13 @@ lemma morrisThorneRedshiftNull_one_mul_self (hx : x ∈ morrisThorneDomain b) :
     _ = _ := by rw [hs, he]
 
 lemma isNull_morrisThorneRedshiftNull (hx : x ∈ morrisThorneDomain b) :
-    IsNull (Matrix.toBilin' (morrisThorneRedshiftMetric Φ b x)) (morrisThorneRedshiftNull Φ b x) := by
+    IsNull (Matrix.toBilin' (morrisThorneRedshiftMetric Φ b x))
+      (morrisThorneRedshiftNull Φ b x) := by
   have h2 := (morrisThorneDomain.one_sub_pos hx)
   refine ⟨?_, fun h => ?_⟩
   · rw [morrisThorneRedshiftMetric, toBilin'_diagonal_four]
-    simp only [morrisThorneRedshiftNull]
-    simp
+    simp only [Fin.isValue, Matrix.cons_val_zero, morrisThorneRedshiftNull, mul_one,
+      Matrix.cons_val_one, Matrix.cons_val, mul_zero, add_zero]
     rw [morrisThorneRedshiftNull_one_mul_self hx]
     field_simp
     ring
