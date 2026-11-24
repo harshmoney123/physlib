@@ -38,12 +38,13 @@ convention, so `-⟪·, ·⟫ₘ` is Lorentzian (`isLorentzian_minkowski`).
 - `IsLorentzian.isSpacelike_of_orthogonal` : a nonzero vector orthogonal to a timelike vector
   is spacelike.
 - `IsLorentzian.mul_self_le_sq_of_isTimelike` : reversed Cauchy-Schwarz for timelike vectors.
-- `IsLorentzian.mul_self_eq_sq_iff` : equality in reversed Cauchy-Schwarz iff the vectors are proportional.
+- `IsLorentzian.mul_self_eq_sq_iff` : equality in reversed Cauchy-Schwarz iff the vectors are
+  proportional.
 - `IsLorentzian.isFutureTimelike_add` : the sum of future-directed timelike vectors is
   future-directed timelike.
 - `IsLorentzian.isFutureCausal_add` : the same for future-directed causal vectors.
-- `IsLorentzian.isFutureCausal_or_isPastCausal`, `IsLorentzian.isPastCausal_iff_neg` : every causal vector is
-  future- or past-directed, and past-directed means negative of future-directed.
+- `IsLorentzian.isFutureCausal_or_isPastCausal`, `IsLorentzian.isPastCausal_iff_neg` : every causal
+  vector is future- or past-directed, and past-directed means negative of future-directed.
 - `isLorentzian_minkowski` : the Minkowski metric is Lorentzian.
 
 ## iii. Table of contents
