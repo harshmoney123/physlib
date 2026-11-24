@@ -106,7 +106,7 @@ lemma requiredDensity_morrisThorne (hb : ContDiff ℝ ∞ b) (hx : x ∈ morrisT
   have h1 := (morrisThorneDomain.pos hx).ne'
   simp only [requiredDensity, requiredStressEnergy, Matrix.of_apply, einstein_morrisThorne hb hx,
     morrisThorneEinstein, Matrix.diagonal_apply_eq]
-  simp
+  simp only [Fin.isValue, Matrix.cons_val_zero]
   field_simp
 
 /-- The radial pressure of the matter required by a Morris-Thorne wormhole is
@@ -118,7 +118,8 @@ lemma requiredRadialPressure_morrisThorne (hb : ContDiff ℝ ∞ b) (hx : x ∈ 
   simp only [requiredRadialPressure, requiredStressEnergy, Matrix.of_apply,
     einstein_morrisThorne hb hx, morrisThorneMetric_inv hx, morrisThorneEinstein,
     Matrix.diagonal_apply_eq]
-  simp
+  simp only [Fin.isValue, Matrix.cons_val_one, Matrix.cons_val_zero, Nat.succ_eq_add_one,
+    Nat.reduceAdd, mul_inv_rev]
   field_simp
 
 /-- `ρ + p_r = (r b' - b) / (8 π r³)` for the matter required by a Morris-Thorne wormhole. -/
@@ -251,7 +252,8 @@ lemma eventually_mul_deriv_lt_nhdsGT_throat (hb : ContDiff ℝ ∞ b) (hr₀ : 0
   have hneg : (fun r => r * deriv b r - b r) r₀ < 0 := by
     simp only [hthroat]
     nlinarith
-  have := (hc.eventually_lt continuousAt_const hneg).filter_mono (nhdsWithin_le_nhds (s := Set.Ioi r₀))
+  have := (hc.eventually_lt continuousAt_const hneg).filter_mono
+    (nhdsWithin_le_nhds (s := Set.Ioi r₀))
   filter_upwards [this] with r hr
   linarith
 

@@ -234,7 +234,8 @@ lemma coordDeriv_morrisThorneMetric_rr (hb : ContDiff ℝ ∞ b) (hx : x ∈ mor
   have h5 := (morrisThorneDomain.sub_pos hx).ne'
   have hA : HasDerivAt (fun r : ℝ => (1 - b r / r)⁻¹)
       (((deriv b (x 1) * x 1 - b (x 1)) / x 1 ^ 2) / (1 - b (x 1) / x 1) ^ 2) (x 1) := by
-    have hb1 : HasDerivAt b (deriv b (x 1)) (x 1) := ((hb.differentiable (by simp)) (x 1)).hasDerivAt
+    have hb1 : HasDerivAt b (deriv b (x 1)) (x 1) :=
+      ((hb.differentiable (by simp)) (x 1)).hasDerivAt
     have := ((hasDerivAt_const (x 1) (1 : ℝ)).sub (hb1.fun_div (hasDerivAt_id' (x 1)) h1)).inv h2
     refine this.congr_deriv ?_
     simp only [Pi.sub_apply]
