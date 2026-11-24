@@ -38,11 +38,13 @@ cyclicity of the trace together with the symmetry of second derivatives of `g`.
 - `ricci` : the Ricci tensor.
 - `ricciScalar` : the Ricci scalar.
 - `einstein` : the Einstein tensor.
+- `riemannLower`, `kretschmann` : the lowered Riemann tensor and the Kretschmann scalar.
 - `riemann_antisymm` : `R^a_{bcd} = -R^a_{bdc}`.
 - `ricci_symm` : the Ricci tensor of a Lorentzian metric field is symmetric.
 - `einstein_symm` : the Einstein tensor of a Lorentzian metric field is symmetric.
 - `coordDeriv_comp_proj`, `coordDeriv_proj_mul` : coordinate derivatives of functions of single
   coordinates, used for metrics depending on few coordinates.
+- `kretschmann_diagonal` : the Kretschmann scalar of a diagonal metric.
 - `riemann_const`, `ricci_const`, `ricciScalar_const`, `einstein_const` : all of them vanish for a
   constant metric.
 
@@ -54,6 +56,7 @@ cyclicity of the trace together with the symmetry of second derivatives of `g`.
 - D. Calculus with coordinate derivatives
 - E. Derivative of the inverse metric
 - F. Symmetry of the Ricci tensor
+- G. The Kretschmann scalar of a diagonal metric
 
 ## iv. References
 
@@ -93,6 +96,18 @@ def ricciScalar (g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ) (x : Fin 4 
 /-- The Einstein tensor `G_{ab} = R_{ab} - 1/2 g_{ab} R`. -/
 def einstein (g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ) (x : Fin 4 → ℝ) (a b : Fin 4) : ℝ :=
   ricci g x a b - g x a b * ricciScalar g x / 2
+
+/-- The Riemann tensor with all indices down, `R_{abcd} = g_{ae} R^e_{bcd}`. -/
+def riemannLower (g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ) (x : Fin 4 → ℝ) (a b c d : Fin 4) :
+    ℝ :=
+  ∑ e, g x a e * riemann g x e b c d
+
+/-- The Kretschmann scalar `K = R_{abcd} R^{abcd}`, where the indices of the second factor are
+raised with the inverse metric. -/
+def kretschmann (g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ) (x : Fin 4 → ℝ) : ℝ :=
+  ∑ a, ∑ b, ∑ c, ∑ d, riemannLower g x a b c d
+    * ∑ a', ∑ b', ∑ c', ∑ d', (g x)⁻¹ a a' * (g x)⁻¹ b b' * (g x)⁻¹ c c' * (g x)⁻¹ d d'
+      * riemannLower g x a' b' c' d'
 
 /-!
 
@@ -411,5 +426,24 @@ lemma einstein_symm (hg : IsLorentzianMetricOn g U) (hx : x ∈ U) (a b : Fin 4)
   simp only [einstein, ricci_symm hg hx a b, (hg.symm x hx).apply a b]
 
 end Metric
+
+/-!
+
+## G. The Kretschmann scalar of a diagonal metric
+
+-/
+
+/-- The Kretschmann scalar of a diagonal metric `g = diag(w)` with inverse `diag(v)`:
+`K = Σ w_a² v_a v_b v_c v_d (R^a_{bcd})²`. -/
+lemma kretschmann_diagonal {g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ} {x : Fin 4 → ℝ}
+    {w v : Fin 4 → ℝ} (hg : g x = Matrix.diagonal w) (hv : (g x)⁻¹ = Matrix.diagonal v) :
+    kretschmann g x = ∑ a, ∑ b, ∑ c, ∑ d,
+      w a * (v a * w a) * v b * v c * v d * riemann g x a b c d ^ 2 := by
+  rw [hg] at hv
+  simp only [kretschmann, riemannLower, hg, hv, Matrix.diagonal_apply, ite_mul, mul_ite, zero_mul,
+    mul_zero, Finset.sum_ite_eq, Finset.mem_univ, ite_true]
+  refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ =>
+    Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun d _ => ?_
+  ring
 
 end GeneralRelativity
