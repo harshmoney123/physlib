@@ -139,8 +139,8 @@ private lemma sq_le_of_orth_witness (hg : IsLorentzian g) {u : V}
   simp only [discrim] at this
   nlinarith
 
-private lemma pos_aux {c a b gxx gyy gxy : ℝ} (hc : c < 0) (hxx : 0 ≤ gxx) (h1 : a ^ 2 * c + gxx < 0)
-    (h2 : a * b * c + gxy = 0) (hcs : gxy ^ 2 ≤ gxx * gyy) (hb : b ≠ 0) :
+private lemma pos_aux {c a b gxx gyy gxy : ℝ} (hc : c < 0) (hxx : 0 ≤ gxx)
+    (h1 : a ^ 2 * c + gxx < 0) (h2 : a * b * c + gxy = 0) (hcs : gxy ^ 2 ≤ gxx * gyy) (hb : b ≠ 0) :
     0 < b ^ 2 * c + gyy := by
   by_contra hcon
   have hbpos : 0 < -(b ^ 2 * c) := by
