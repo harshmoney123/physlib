@@ -38,6 +38,7 @@ convention, so `-⟪·, ·⟫ₘ` is Lorentzian (`isLorentzian_minkowski`).
 - `IsLorentzian.isSpacelike_of_orthogonal` : a nonzero vector orthogonal to a timelike vector
   is spacelike.
 - `IsLorentzian.mul_self_le_sq_of_isTimelike` : reversed Cauchy-Schwarz for timelike vectors.
+- `IsLorentzian.mul_self_eq_sq_iff` : equality in reversed Cauchy-Schwarz iff the vectors are proportional.
 - `IsLorentzian.isFutureTimelike_add` : the sum of future-directed timelike vectors is
   future-directed timelike.
 - `IsLorentzian.isFutureCausal_add` : the same for future-directed causal vectors.
@@ -221,25 +222,48 @@ lemma sq_le_of_orthogonal (hg : IsLorentzian g) {u x y : V} (hu : IsTimelike g u
 
 -/
 
+/-- Split `v` along a timelike `u` and its orthogonal complement. -/
+private lemma exists_orth_decomp {u : V} (hu : IsTimelike g u) (v : V) :
+    ∃ (a : ℝ) (w : V), g u w = 0 ∧ v = a • u + w ∧ g u v = a * g u u := by
+  have hne : g u u ≠ 0 := hu.ne
+  have hav : g u v / g u u * g u u = g u v := div_mul_cancel₀ _ hne
+  refine ⟨g u v / g u u, v - (g u v / g u u) • u, ?_, by simp, hav.symm⟩
+  simp only [map_sub, map_smul, smul_eq_mul]
+  linarith
+
 /-- Reversed Cauchy-Schwarz: for timelike `u` and any `v`, `g u u * g v v ≤ (g u v) ^ 2`. In
 particular it holds for two timelike vectors. -/
 lemma mul_self_le_sq_of_isTimelike (hg : IsLorentzian g) {u : V} (hu : IsTimelike g u) (v : V) :
     g u u * g v v ≤ g u v ^ 2 := by
-  have hne : g u u ≠ 0 := hu.ne
-  set a := g u v / g u u
-  have hav : a * g u u = g u v := div_mul_cancel₀ _ hne
-  have hw : g u (v - a • u) = 0 := by
-    simp only [map_sub, map_smul, smul_eq_mul]
-    linarith
+  obtain ⟨a, w, hw, hdec, huv⟩ := exists_orth_decomp hu v
   have hnn := hg.nonneg_of_orthogonal hu hw
-  have hdec : v = a • u + (v - a • u) := by simp
-  have hvv : g v v = a * a * g u u + g (v - a • u) (v - a • u) := by
+  have hvv : g v v = a * a * g u u + g w w := by
     conv_lhs => rw [hdec]
     rw [form_decomp hg hw hw]
-  have huv : g u v = a * g u u := hav.symm
   rw [hvv, huv]
-  have : g u u * g (v - a • u) (v - a • u) ≤ 0 := mul_nonpos_of_nonpos_of_nonneg hu.le hnn
+  have : g u u * g w w ≤ 0 := mul_nonpos_of_nonpos_of_nonneg hu.le hnn
   nlinarith
+
+/-- Equality in the reversed Cauchy-Schwarz inequality for a timelike `u` holds exactly when `v`
+is proportional to `u`. -/
+lemma mul_self_eq_sq_iff (hg : IsLorentzian g) {u : V} (hu : IsTimelike g u) (v : V) :
+    g u u * g v v = g u v ^ 2 ↔ ∃ a : ℝ, v = a • u := by
+  constructor
+  · intro h
+    obtain ⟨a, w, hw, hdec, huv⟩ := exists_orth_decomp hu v
+    have hvv : g v v = a * a * g u u + g w w := by
+      conv_lhs => rw [hdec]
+      rw [form_decomp hg hw hw]
+    rw [hvv, huv] at h
+    have hww : g u u * g w w = 0 := by nlinarith
+    have hw0 : g w w = 0 := (mul_eq_zero.mp hww).resolve_left hu.ne
+    have : w = 0 := by
+      by_contra hne
+      exact absurd (hg.isSpacelike_of_orthogonal hu hne hw) (by unfold IsSpacelike; linarith)
+    exact ⟨a, by simp [hdec, this]⟩
+  · rintro ⟨a, rfl⟩
+    simp only [map_smul, LinearMap.smul_apply, smul_eq_mul]
+    ring
 
 /-- The product of two timelike vectors is nonzero. -/
 lemma g_ne_zero_of_isTimelike (hg : IsLorentzian g) {u v : V} (hu : IsTimelike g u)
