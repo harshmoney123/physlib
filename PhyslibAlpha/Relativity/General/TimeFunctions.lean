@@ -175,17 +175,18 @@ lemma not_isClosedFutureCausalCurve_of_isTimeFunctionOn {f : (Fin 4 → ℝ) →
 -/
 
 /-- A future-directed causal vector for the Minkowski metric has positive time component, when the
-time orientation `X` is timelike with positive time component. -/
+time orientation `X` is timelike with positive time component. In the signature `(+,-,-,-)`
+future-directed means `0 < g X v`. -/
 lemma time_pos_of_future_causal_minkowskiField {x X v : Fin 4 → ℝ}
     (hX : IsTimelike (Matrix.toBilin' (minkowskiField x)) X) (hX0 : 0 < X 0)
     (hv : IsCausal (Matrix.toBilin' (minkowskiField x)) v)
-    (hlt : Matrix.toBilin' (minkowskiField x) X v < 0) : 0 < v 0 := by
+    (hpos : 0 < Matrix.toBilin' (minkowskiField x) X v) : 0 < v 0 := by
   by_contra hneg
   rw [not_lt] at hneg
   have hX' := hX
   have hv' := hv.1
   simp only [IsTimelike, minkowskiField_bilin] at hX'
-  simp only [minkowskiField_bilin] at hv' hlt
+  simp only [minkowskiField_bilin] at hv' hpos
   have hcs : (X 1 * v 1 + X 2 * v 2 + X 3 * v 3) ^ 2 ≤
       (X 1 ^ 2 + X 2 ^ 2 + X 3 ^ 2) * (v 1 ^ 2 + v 2 ^ 2 + v 3 ^ 2) := by
     nlinarith [sq_nonneg (X 1 * v 2 - X 2 * v 1), sq_nonneg (X 1 * v 3 - X 3 * v 1),
