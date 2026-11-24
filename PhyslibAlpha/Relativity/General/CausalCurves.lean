@@ -22,6 +22,8 @@ Timelike and causal curves in a coordinate spacetime, and closed timelike curves
 In a coordinate chart a curve is a map `γ : ℝ → Fin 4 → ℝ`, restricted to a compact interval
 `[a, b]`. It is a timelike (causal) curve for a metric field `g` on an open set `U` if it is `C¹`,
 stays in `U`, and its tangent vector `γ'(t)` is timelike (causal) for `g (γ t)` at every parameter.
+The metric has the signature `(+,-,-,-)` of `PhyslibAlpha.Relativity.General.PointwiseCausality`,
+so a tangent vector `v` is timelike when `0 < g v v` and causal when `0 ≤ g v v` and `v ≠ 0`.
 
 A closed curve in the spacetime obtained from `U` by identifying points that differ by a period
 `τ` (for example the flat cylinder, Minkowski space with `t ~ t + T`) is a curve in the covering
@@ -30,10 +32,11 @@ space whose endpoints differ by `τ`. We call such a curve a timelike (causal) l
 (`IsClosedTimelikeCurve`). A timelike loop has a tangent of constant time orientation, so it need
 not be oriented separately.
 
-For Minkowski space, the time coordinate is strictly monotone along any causal curve, so there is
-no closed causal curve (`not_isClosedCausalCurve_minkowskiField`), and more generally no causal
-loop modulo a purely spatial period. On the flat cylinder, the curve `t ↦ (t, 0, 0, 0)`, `0 ≤ t ≤ T`
-is a closed timelike curve (`exists_isTimelikeLoopMod_cylinder`).
+For Minkowski space `minkowskiField = diag(1, -1, -1, -1)`, the time coordinate is strictly
+monotone along any causal curve, so there is no closed causal curve
+(`not_isClosedCausalCurve_minkowskiField`), and more generally no causal loop modulo a purely
+spatial period. On the flat cylinder, the curve `t ↦ (t, 0, 0, 0)`, `0 ≤ t ≤ T` is a closed
+timelike curve (`exists_isTimelikeLoopMod_cylinder`).
 
 ## ii. Key results
 
@@ -173,12 +176,12 @@ private lemma time_component_ne_zero_of_isCausal {v : Fin 4 → ℝ} (x : Fin 4 
   have h := hv.1
   rw [minkowskiField_bilin, h0] at h
   refine hv.2 (funext fun i => ?_)
-  have h1 := sq_nonneg (v 1)
-  have h2 := sq_nonneg (v 2)
-  have h3 := sq_nonneg (v 3)
-  have e1 : v 1 = 0 := by nlinarith
-  have e2 : v 2 = 0 := by nlinarith
-  have e3 : v 3 = 0 := by nlinarith
+  have h1 := mul_self_nonneg (v 1)
+  have h2 := mul_self_nonneg (v 2)
+  have h3 := mul_self_nonneg (v 3)
+  have e1 : v 1 = 0 := mul_self_eq_zero.mp (by linarith)
+  have e2 : v 2 = 0 := mul_self_eq_zero.mp (by linarith)
+  have e3 : v 3 = 0 := mul_self_eq_zero.mp (by linarith)
   fin_cases i <;> simp [h0, e1, e2, e3]
 
 /-- Along a causal curve in Minkowski space the time coordinate takes different values at the

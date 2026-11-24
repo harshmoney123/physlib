@@ -27,6 +27,13 @@ Riemann tensor
 the Ricci tensor `R_{bd} = R^a_{bad}`, the Ricci scalar `R = g^{bd} R_{bd}` and the Einstein tensor
 `G_{ab} = R_{ab} - 1/2 g_{ab} R`.
 
+These definitions do not refer to the signature of the metric. Together with the signature
+`(+,-,-,-)` of `PhyslibAlpha.Relativity.General.CoordinateMetric` they are the sign conventions of
+Landau and Lifshitz, in which Einstein's equation reads `G_{ab} = (8 π G / c⁴) T_{ab}` with
+`G` Newton's constant and `c` the speed of light. Under `g ↦ -g` the Christoffel symbols,
+`R^a_{bcd}`, the Ricci tensor and the Einstein tensor are unchanged and the Ricci scalar changes
+sign.
+
 The Ricci tensor is symmetric for a smooth Lorentzian metric. The only non-algebraic input is the
 symmetry of the contracted derivative `∂_d Γ^a_{ab}`. For this we write `Γ^a_{ab}` as the trace
 `1/2 g^{ae} ∂_b g_{ea}`, differentiate it using `∂_d g^{-1} = - g^{-1} (∂_d g) g^{-1}`, and use the
@@ -61,6 +68,7 @@ cyclicity of the trace together with the symmetry of second derivatives of `g`.
 ## iv. References
 
 - B. O'Neill, *Semi-Riemannian Geometry*, Chapter 3.
+- L. D. Landau and E. M. Lifshitz, *The Classical Theory of Fields*, Sections 91, 92 and 95.
 
 -/
 

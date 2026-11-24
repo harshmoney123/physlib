@@ -16,14 +16,19 @@ The null, weak and dominant energy conditions for a stress-energy tensor `T`.
 
 ## i. Overview
 
-On a real vector space `V` with a Lorentzian form `g` (`IsLorentzian`, signature `(-,+,+,+)`),
-a stress-energy tensor at a point is a bilinear form `T`. The energy conditions are pointwise
-positivity conditions on `T` against vectors of a given causal character:
+On a real vector space `V` with a Lorentzian form `g` (`IsLorentzian`, signature `(+,-,-,-)` as
+for Physlib's Minkowski product), a stress-energy tensor at a point is a bilinear form `T`, with
+both indices down. The energy conditions are pointwise positivity conditions on `T` against vectors
+of a given causal character:
 
 - null: `T k k ≥ 0` for every null vector `k`;
 - weak: `T u u ≥ 0` for every timelike vector `u`;
 - dominant: `T u v ≥ 0` for all future-directed causal vectors `u`, `v`;
 - strong: `(T_{ab} - T g_{ab} / (n - 2)) u^a u^b ≥ 0` for every timelike `u`.
+
+These statements do not depend on the sign convention of the metric: the tensor `T_{ab}` with both
+indices down and the product `T g_{ab}` of the trace `T = g^{ab} T_{ab}` with the metric are
+unchanged under `g ↦ -g`.
 
 ## ii. Key results
 
@@ -86,31 +91,31 @@ namespace IsLorentzian
 
 variable {g : LinearMap.BilinForm ℝ V}
 
-/-- For a Lorentzian `g` and a null vector `k`, there is a timelike `t` with `g k t < 0`. -/
-lemma exists_isTimelike_g_neg (hg : IsLorentzian g) {k : V} (hk : IsNull g k) :
-    ∃ t, IsTimelike g t ∧ g k t < 0 := by
+/-- For a Lorentzian `g` and a null vector `k`, there is a timelike `t` with `0 < g k t`. -/
+lemma exists_isTimelike_g_pos (hg : IsLorentzian g) {k : V} (hk : IsNull g k) :
+    ∃ t, IsTimelike g t ∧ 0 < g k t := by
   obtain ⟨u, hu, _⟩ := hg.exists_timelike
   have hu : IsTimelike g u := hu
   have hne : g k u ≠ 0 := fun h => by
-    have : 0 < g k k := hg.isSpacelike_of_orthogonal hu hk.2 (by rw [hg.symm]; exact h)
+    have : g k k < 0 := hg.isSpacelike_of_orthogonal hu hk.2 (by rw [hg.symm]; exact h)
     linarith [hk.1]
   rcases lt_or_gt_of_ne hne with h | h
-  · exact ⟨u, hu, h⟩
   · exact ⟨-u, by unfold IsTimelike at hu ⊢; simpa using hu, by simpa using h⟩
+  · exact ⟨u, hu, h⟩
 
 /-- A bilinear form which is non-negative on timelike vectors is non-negative on null vectors. -/
 lemma nonneg_of_isNull (hg : IsLorentzian g) {B : LinearMap.BilinForm ℝ V}
     (h : ∀ u, IsTimelike g u → 0 ≤ B u u) {k : V} (hk : IsNull g k) : 0 ≤ B k k := by
-  obtain ⟨t, ht, hkt⟩ := hg.exists_isTimelike_g_neg hk
+  obtain ⟨t, ht, hkt⟩ := hg.exists_isTimelike_g_pos hk
   have hε : ∀ ε : ℝ, 0 < ε → 0 ≤ B k k + ε * (B k t + B t k) + ε ^ 2 * B t t := by
     intro ε hε
     have hu : IsTimelike g (k + ε • t) := by
       unfold IsTimelike
       have := hk.1
-      have h2 : g t t < 0 := ht
+      have h2 : 0 < g t t := ht
       simp only [map_add, map_smul, LinearMap.add_apply, LinearMap.smul_apply, smul_eq_mul,
         hg.symm t k]
-      nlinarith [mul_pos hε hε, mul_neg_of_pos_of_neg hε hkt]
+      nlinarith [mul_pos hε hε, mul_pos hε hkt]
     have := h _ hu
     simp only [map_add, map_smul, LinearMap.add_apply, LinearMap.smul_apply, smul_eq_mul] at this
     linarith
@@ -146,7 +151,7 @@ lemma separatingLeft (hg : IsLorentzian g) : g.SeparatingLeft := by
   have hu' : IsTimelike g u := hu
   -- `x` is orthogonal to the timelike `u` and nonzero, hence spacelike
   have := hg.isSpacelike_of_orthogonal hu' hne hxu
-  exact absurd hxx this.ne'
+  exact absurd hxx this.ne
 
 /-- A Lorentzian form on a finite-dimensional space is non-degenerate. -/
 lemma nondegenerate [FiniteDimensional ℝ V] (hg : IsLorentzian g) : g.Nondegenerate :=

@@ -22,8 +22,9 @@ A Lorentzian metric field on an open set of `Fin 4 → ℝ` and its Christoffel 
 
 In a single coordinate chart a spacetime metric is a field `g : (Fin 4 → ℝ) → Matrix (Fin 4)
 (Fin 4) ℝ` of matrices `g x = g_{μν}(x)`. We say that `g` is a Lorentzian metric on an open set `U`
-(`IsLorentzianMetricOn`) if it is symmetric, smooth, and of signature `(-,+,+,+)` at every point of
-`U`. Non-degeneracy follows from the signature (`IsLorentzianMetricOn.det_ne_zero`).
+(`IsLorentzianMetricOn`) if it is symmetric, smooth, and of signature `(+,-,-,-)` at every point of
+`U`, the sign convention of Physlib's `minkowskiMatrix`. Non-degeneracy follows from the signature
+(`IsLorentzianMetricOn.det_ne_zero`).
 
 The Christoffel symbols of the second kind are
 `Γ^a_{bc} = 1/2 g^{ad} (∂_b g_{dc} + ∂_c g_{bd} - ∂_d g_{bc})`,
@@ -33,14 +34,15 @@ componentwise.
 ## ii. Key results
 
 - `IsLorentzianMetricOn` : the metric field is symmetric, smooth and Lorentzian on an open set.
-- `isLorentzian_diagonal_four` : a diagonal matrix of signs `(-,+,+,+)` is Lorentzian.
+- `isLorentzian_diagonal_four` : a diagonal matrix of signs `(+,-,-,-)` is Lorentzian.
 - `IsLorentzianMetricOn.det_ne_zero` : a Lorentzian metric is non-degenerate.
 - `christoffel` : the Christoffel symbols of the second kind.
 - `christoffel_symm` : `Γ^a_{bc} = Γ^a_{cb}`.
 - `sum_metric_mul_christoffel` : lowering the index recovers the first-kind symbols.
 - `christoffel_const` : the Christoffel symbols of a constant metric vanish.
-- `minkowskiField` : the constant Minkowski metric field, with
+- `minkowskiField` : the constant Minkowski metric field `diag(1, -1, -1, -1)`, with
   `isLorentzianMetricOn_minkowskiField` and `christoffel_minkowskiField`.
+- `minkowskiField_eq_reindex_minkowskiMatrix` : its matrix is Physlib's `minkowskiMatrix`.
 
 ## iii. Table of contents
 
@@ -70,7 +72,7 @@ open scoped ContDiff
 -/
 
 /-- A metric field `g` is a Lorentzian metric on the open set `U` of coordinates if it is
-symmetric, smooth and of signature `(-,+,+,+)` at each point of `U`. -/
+symmetric, smooth and of signature `(+,-,-,-)` at each point of `U`. -/
 structure IsLorentzianMetricOn (g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ)
     (U : Set (Fin 4 → ℝ)) : Prop where
   /-- The coordinate domain is open. -/
@@ -79,7 +81,7 @@ structure IsLorentzianMetricOn (g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) �
   symm : ∀ x ∈ U, (g x).IsSymm
   /-- Each component of the metric is smooth. -/
   contDiffOn : ∀ a b, ContDiffOn ℝ ∞ (fun x => g x a b) U
-  /-- The metric has signature `(-,+,+,+)`. -/
+  /-- The metric has signature `(+,-,-,-)`. -/
   lorentzian : ∀ x ∈ U, IsLorentzian (Matrix.toBilin' (g x))
 
 /-- A Lorentzian bilinear form given by a matrix has non-zero determinant. -/
@@ -95,9 +97,9 @@ lemma IsLorentzian.det_ne_zero {G : Matrix (Fin 4) (Fin 4) ℝ}
     simp [Matrix.toBilin'_apply', hGv]
   linarith
 
-/-- A diagonal matrix with entries of signs `(-,+,+,+)` is Lorentzian. -/
-lemma isLorentzian_diagonal_four {w : Fin 4 → ℝ} (h0 : w 0 < 0) (h1 : 0 < w 1) (h2 : 0 < w 2)
-    (h3 : 0 < w 3) : IsLorentzian (Matrix.toBilin' (Matrix.diagonal w)) := by
+/-- A diagonal matrix with entries of signs `(+,-,-,-)` is Lorentzian. -/
+lemma isLorentzian_diagonal_four {w : Fin 4 → ℝ} (h0 : 0 < w 0) (h1 : w 1 < 0) (h2 : w 2 < 0)
+    (h3 : w 3 < 0) : IsLorentzian (Matrix.toBilin' (Matrix.diagonal w)) := by
   have hb : ∀ v u : Fin 4 → ℝ, Matrix.toBilin' (Matrix.diagonal w) v u
       = w 0 * (v 0 * u 0) + w 1 * (v 1 * u 1) + w 2 * (v 2 * u 2) + w 3 * (v 3 * u 3) := by
     intro v u
@@ -109,7 +111,7 @@ lemma isLorentzian_diagonal_four {w : Fin 4 → ℝ} (h0 : w 0 < 0) (h1 : 0 < w 
     simp at h
     have hv0 : v 0 = 0 := by
       rcases h with h | h
-      · exact absurd h h0.ne
+      · exact absurd h h0.ne'
       · exact h
     have hne : v 1 ≠ 0 ∨ v 2 ≠ 0 ∨ v 3 ≠ 0 := by
       by_contra hcon
@@ -117,13 +119,13 @@ lemma isLorentzian_diagonal_four {w : Fin 4 → ℝ} (h0 : w 0 < 0) (h1 : 0 < w 
       refine hv (funext fun i => ?_)
       fin_cases i <;> simp [hv0, hcon]
     rw [hb, hv0]
-    have a1 := mul_nonneg h1.le (mul_self_nonneg (v 1))
-    have a2 := mul_nonneg h2.le (mul_self_nonneg (v 2))
-    have a3 := mul_nonneg h3.le (mul_self_nonneg (v 3))
+    have a1 := mul_nonpos_of_nonpos_of_nonneg h1.le (mul_self_nonneg (v 1))
+    have a2 := mul_nonpos_of_nonpos_of_nonneg h2.le (mul_self_nonneg (v 2))
+    have a3 := mul_nonpos_of_nonpos_of_nonneg h3.le (mul_self_nonneg (v 3))
     rcases hne with h' | h' | h'
-    · have := mul_pos h1 (mul_self_pos.2 h'); simp; linarith
-    · have := mul_pos h2 (mul_self_pos.2 h'); simp; linarith
-    · have := mul_pos h3 (mul_self_pos.2 h'); simp; linarith
+    · have := mul_neg_of_neg_of_pos h1 (mul_self_pos.2 h'); simp; linarith
+    · have := mul_neg_of_neg_of_pos h2 (mul_self_pos.2 h'); simp; linarith
+    · have := mul_neg_of_neg_of_pos h3 (mul_self_pos.2 h'); simp; linarith
 
 /-- A Lorentzian metric field is non-degenerate at every point of its domain. -/
 lemma IsLorentzianMetricOn.det_ne_zero {g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ}
@@ -202,39 +204,32 @@ lemma christoffel_const (G : Matrix (Fin 4) (Fin 4) ℝ) (x : Fin 4 → ℝ) (a 
 
 -/
 
-/-- The constant Minkowski metric field `diag(-1, 1, 1, 1)`. -/
+/-- The constant Minkowski metric field `diag(1, -1, -1, -1)`, in the `(+,-,-,-)` convention of
+Physlib's `minkowskiMatrix`. The coordinates are `(x⁰, x¹, x², x³)` with `x⁰ = c t`, as for
+`SpaceTime`. -/
 def minkowskiField : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ :=
-  fun _ => Matrix.diagonal ![-1, 1, 1, 1]
+  fun _ => Matrix.diagonal ![1, -1, -1, -1]
+
+/-- The matrix of the Minkowski metric field is Physlib's `minkowskiMatrix` in `3 + 1` dimensions,
+with its index type `Fin 1 ⊕ Fin 3` identified with `Fin 4`. -/
+lemma minkowskiField_eq_reindex_minkowskiMatrix (x : Fin 4 → ℝ) :
+    minkowskiField x = Matrix.reindex finSumFinEquiv finSumFinEquiv (minkowskiMatrix (d := 3)) := by
+  rw [← Equiv.symm_apply_eq]
+  ext (i | i) (j | j) <;> fin_cases i <;> fin_cases j <;> simp [minkowskiField] <;> rfl
 
 /-- The bilinear form of the Minkowski metric field in components. -/
 lemma minkowskiField_bilin (x v w : Fin 4 → ℝ) :
-    Matrix.toBilin' (minkowskiField x) v w = -(v 0 * w 0) + v 1 * w 1 + v 2 * w 2 + v 3 * w 3 := by
+    Matrix.toBilin' (minkowskiField x) v w = v 0 * w 0 - v 1 * w 1 - v 2 * w 2 - v 3 * w 3 := by
   simp [minkowskiField, Matrix.toBilin'_apply', dotProduct, Matrix.mulVec_diagonal,
     Fin.sum_univ_four]
+  ring
 
 /-- The Minkowski metric field is a Lorentzian metric on all of `Fin 4 → ℝ`. -/
 lemma isLorentzianMetricOn_minkowskiField : IsLorentzianMetricOn minkowskiField Set.univ where
   isOpen := isOpen_univ
   symm _ _ := Matrix.isSymm_diagonal _
   contDiffOn _ _ := contDiffOn_const
-  lorentzian x _ := by
-    refine ⟨fun v w => ?_, Pi.single 0 1, ?_, fun v h hv => ?_⟩
-    · simp only [minkowskiField_bilin]
-      ring
-    · rw [minkowskiField_bilin]
-      simp
-    · simp only [minkowskiField_bilin, Pi.single_eq_same] at h
-      have h0 : v 0 = 0 := by simpa [Pi.single_apply] using h
-      have hne : v 1 ≠ 0 ∨ v 2 ≠ 0 ∨ v 3 ≠ 0 := by
-        by_contra hcon
-        simp only [not_or, not_not] at hcon
-        refine hv (funext fun i => ?_)
-        fin_cases i <;> simp [h0, hcon]
-      rw [minkowskiField_bilin, h0]
-      rcases hne with h1 | h1 | h1
-      · have := sq_pos_of_ne_zero h1; nlinarith [sq_nonneg (v 2), sq_nonneg (v 3)]
-      · have := sq_pos_of_ne_zero h1; nlinarith [sq_nonneg (v 1), sq_nonneg (v 3)]
-      · have := sq_pos_of_ne_zero h1; nlinarith [sq_nonneg (v 1), sq_nonneg (v 2)]
+  lorentzian _ _ := isLorentzian_diagonal_four (by simp) (by simp) (by simp) (by simp)
 
 /-- The Christoffel symbols of the Minkowski metric field vanish. -/
 lemma christoffel_minkowskiField (x : Fin 4 → ℝ) (a b c : Fin 4) :

@@ -17,8 +17,9 @@ The chronological future `I⁺(p)`, the causal future `J⁺(p)` and the chronolo
 ## i. Overview
 
 A time orientation on a coordinate spacetime `(U, g)` is a vector field `X` which is timelike for
-`g` on `U` (`IsTimeOrientationOn`). A curve is future-directed if its tangent `γ'(t)` satisfies
-`g (X (γ t)) (γ' t) < 0` at every parameter.
+`g` on `U` (`IsTimeOrientationOn`). The metric has the signature `(+,-,-,-)` of
+`PhyslibAlpha.Relativity.General.PointwiseCausality`, so a curve is future-directed if its tangent
+`γ'(t)` satisfies `0 < g (X (γ t)) (γ' t)` at every parameter.
 
 Following Hawking and Ellis, `I⁺(p)` consists of the points which can be reached from `p` by a
 piecewise `C¹` future-directed timelike curve. A piecewise `C¹` curve is a finite concatenation of
@@ -74,18 +75,18 @@ structure IsTimeOrientationOn (g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) �
   isTimelike : ∀ x ∈ U, IsTimelike (Matrix.toBilin' (g x)) (X x)
 
 /-- A future-directed timelike curve on `[a, b]`: a timelike curve whose tangent `v` satisfies
-`g (X (γ t)) v < 0`. -/
+`0 < g (X (γ t)) v`. -/
 def IsFutureTimelikeCurveOn (g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ)
     (X : (Fin 4 → ℝ) → Fin 4 → ℝ) (U : Set (Fin 4 → ℝ)) (γ : ℝ → Fin 4 → ℝ) (a b : ℝ) : Prop :=
   IsTimelikeCurveOn g U γ a b ∧
-    ∀ t ∈ Icc a b, Matrix.toBilin' (g (γ t)) (X (γ t)) (derivWithin γ (Icc a b) t) < 0
+    ∀ t ∈ Icc a b, 0 < Matrix.toBilin' (g (γ t)) (X (γ t)) (derivWithin γ (Icc a b) t)
 
 /-- A future-directed causal curve on `[a, b]`: a causal curve whose tangent `v` satisfies
-`g (X (γ t)) v < 0`. -/
+`0 < g (X (γ t)) v`. -/
 def IsFutureCausalCurveOn (g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ)
     (X : (Fin 4 → ℝ) → Fin 4 → ℝ) (U : Set (Fin 4 → ℝ)) (γ : ℝ → Fin 4 → ℝ) (a b : ℝ) : Prop :=
   IsCausalCurveOn g U γ a b ∧
-    ∀ t ∈ Icc a b, Matrix.toBilin' (g (γ t)) (X (γ t)) (derivWithin γ (Icc a b) t) < 0
+    ∀ t ∈ Icc a b, 0 < Matrix.toBilin' (g (γ t)) (X (γ t)) (derivWithin γ (Icc a b) t)
 
 variable {g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ} {X : (Fin 4 → ℝ) → Fin 4 → ℝ}
   {U : Set (Fin 4 → ℝ)} {γ : ℝ → Fin 4 → ℝ} {a b c d : ℝ}
