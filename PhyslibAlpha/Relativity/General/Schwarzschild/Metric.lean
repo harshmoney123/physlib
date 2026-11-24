@@ -233,11 +233,11 @@ lemma hasDerivAt_gammaTheta (hθ : sin θ ≠ 0) (a b c : Fin 4) :
   split_ifs
   · have := (hasDerivAt_sin θ).fun_pow 2
     convert this using 1
-    simp
+    simp only [Nat.cast_ofNat, Nat.add_one_sub_one, pow_one]
     ring
   · have := ((hasDerivAt_sin θ).fun_mul (hasDerivAt_cos θ)).neg
     convert this using 1
-    simp
+    simp only [mul_neg, neg_add_rev, neg_neg]
     ring
   · have := (hasDerivAt_cos θ).fun_div (hasDerivAt_sin θ) hθ
     convert this using 1
@@ -268,7 +268,8 @@ lemma coordDeriv_schwarzschildMetric_tt (hM : 0 < M) (hx : x ∈ schwarzschildDo
     convert this using 1
     field_simp
     simp
-  have : (fun y => schwarzschildMetric M y 0 0) = fun y => (fun r : ℝ => -(1 - 2 * M / r)) (y 1) := by
+  have : (fun y => schwarzschildMetric M y 0 0)
+      = fun y => (fun r : ℝ => -(1 - 2 * M / r)) (y 1) := by
     funext y; simp [schwarzschildMetric]
   rw [this, coordDeriv_comp_proj 1 hA.differentiableAt, hA.deriv]
 
@@ -286,7 +287,8 @@ lemma coordDeriv_schwarzschildMetric_rr (hM : 0 < M) (hx : x ∈ schwarzschildDo
     simp only [Pi.sub_apply]
     field_simp
     ring
-  have : (fun y => schwarzschildMetric M y 1 1) = fun y => (fun r : ℝ => (1 - 2 * M / r)⁻¹) (y 1) := by
+  have : (fun y => schwarzschildMetric M y 1 1)
+      = fun y => (fun r : ℝ => (1 - 2 * M / r)⁻¹) (y 1) := by
     funext y; simp [schwarzschildMetric]
   rw [this, coordDeriv_comp_proj 1 hA.differentiableAt, hA.deriv]
 
@@ -348,7 +350,8 @@ lemma christoffel_schwarzschild {M : ℝ} {x : Fin 4 → ℝ} (hM : 0 < M)
   have h4 := (schwarzschildDomain.one_sub_pos hM hx).ne'
   fin_cases a <;> fin_cases b <;> fin_cases c <;>
   simp [christoffel, christoffelFirstKind, schwarzschildMetric_inv hM hx,
-    Matrix.diagonal_apply, coordDeriv_schwarzschildMetric_tt hM hx, coordDeriv_schwarzschildMetric_rr hM hx,
+    Matrix.diagonal_apply, coordDeriv_schwarzschildMetric_tt hM hx,
+    coordDeriv_schwarzschildMetric_rr hM hx,
     coordDeriv_schwarzschildMetric_θθ, coordDeriv_schwarzschildMetric_φφ,
     coordDeriv_schwarzschildMetric_offDiag, schwarzschildGammaR, schwarzschildGammaTheta]
   all_goals first | (field_simp; ring) | field_simp
