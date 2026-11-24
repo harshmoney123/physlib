@@ -82,14 +82,16 @@ lemma isOpen_godelDomain : IsOpen godelDomain :=
 lemma contDiff_sinh_real {n : WithTop ℕ∞} : ContDiff ℝ n (sinh : ℝ → ℝ) := by
   have h : (sinh : ℝ → ℝ) = fun x => (exp x - exp (-x)) / 2 := funext Real.sinh_eq
   rw [h]
-  exact ((Real.contDiff_exp (n := n)).sub ((Real.contDiff_exp (n := n)).comp contDiff_neg)).div_const 2
+  exact ((Real.contDiff_exp (n := n)).sub
+    ((Real.contDiff_exp (n := n)).comp contDiff_neg)).div_const 2
 
 /-- The bilinear form of the Gödel metric in components. -/
 lemma godelMetric_bilin (y v w : Fin 4 → ℝ) :
     Matrix.toBilin' (godelMetric y) v w = -(v 0 * w 0) + v 1 * w 1 + v 3 * w 3
       - √2 * sinh (y 1) ^ 2 * (v 0 * w 2 + v 2 * w 0)
       + (sinh (y 1) ^ 2 - sinh (y 1) ^ 4) * (v 2 * w 2) := by
-  simp [Matrix.toBilin'_apply', godelMetric, godelMetricR, dotProduct, Matrix.mulVec, Fin.sum_univ_four]
+  simp [Matrix.toBilin'_apply', godelMetric, godelMetricR, dotProduct, Matrix.mulVec,
+    Fin.sum_univ_four]
   ring
 
 /-!
