@@ -814,6 +814,9 @@ public import PhyslibAlpha.Relativity.General.ChronologyRelations
 public import PhyslibAlpha.Relativity.General.CoordinateMetric
 public import PhyslibAlpha.Relativity.General.Curvature
 public import PhyslibAlpha.Relativity.General.EnergyConditions
+public import PhyslibAlpha.Relativity.General.Godel.Christoffel
+public import PhyslibAlpha.Relativity.General.Godel.ClosedTimelikeCurve
+public import PhyslibAlpha.Relativity.General.Godel.Einstein
 public import PhyslibAlpha.Relativity.General.Godel.Metric
 public import PhyslibAlpha.Relativity.General.MorrisThorne.Einstein
 public import PhyslibAlpha.Relativity.General.MorrisThorne.Metric

@@ -86,6 +86,8 @@ lemma godelVelocityLower_apply_zero (y : Fin 4 → ℝ) : godelVelocityLower y 0
 
 -/
 
+/-- The coordinate derivatives of the Christoffel symbols of the Gödel metric: only `∂_r` is
+non-zero. -/
 lemma coordDeriv_christoffel_godelMetric {x : Fin 4 → ℝ} (hx : x ∈ godelDomain)
     (a b c e : Fin 4) : coordDeriv (fun y => christoffel godelMetric y a b c) x e
       = if e = 1 then godelGamma' a b c (x 1) else 0 := by
@@ -111,7 +113,7 @@ lemma ricci_godelMetric_expr {x : Fin 4 → ℝ} (hx : x ∈ godelDomain) (b d :
 
 /-- The Ricci tensor of the Gödel metric is `R_{ab} = 4 u_a u_b`, where `u_a = g_{a t}` is the
 dust four-velocity. -/
-theorem ricci_godelMetric {x : Fin 4 → ℝ} (hx : x ∈ godelDomain) (b d : Fin 4) :
+lemma ricci_godelMetric {x : Fin 4 → ℝ} (hx : x ∈ godelDomain) (b d : Fin 4) :
     ricci godelMetric x b d = 4 * godelVelocityLower x b * godelVelocityLower x d := by
   have hr : 0 < x 1 := hx
   have hs : sinh (x 1) ≠ 0 := (sinh_pos_iff.2 hr).ne'
@@ -170,7 +172,7 @@ theorem einstein_add_cosmological_godel {x : Fin 4 → ℝ} (hx : x ∈ godelDom
 
 /-- The trace-reversed form of Einstein's equations with dust and a cosmological constant:
 `R_{ab} = ρ u_a u_b + (ρ / 2 + Λ) g_{ab}`. -/
-theorem ricci_godel_dust_cosmological {x : Fin 4 → ℝ} (hx : x ∈ godelDomain) (a b : Fin 4) :
+lemma ricci_godel_dust_cosmological {x : Fin 4 → ℝ} (hx : x ∈ godelDomain) (a b : Fin 4) :
     ricci godelMetric x a b = godelDensity * godelVelocityLower x a * godelVelocityLower x b
       + (godelDensity / 2 + godelCosmologicalConstant) * godelMetric x a b := by
   rw [ricci_godelMetric hx]
