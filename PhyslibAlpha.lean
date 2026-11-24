@@ -814,6 +814,7 @@ public import PhyslibAlpha.Relativity.General.Curvature
 public import PhyslibAlpha.Relativity.General.EnergyConditions
 public import PhyslibAlpha.Relativity.General.MorrisThorne.Einstein
 public import PhyslibAlpha.Relativity.General.MorrisThorne.Metric
+public import PhyslibAlpha.Relativity.General.MorrisThorne.NullEnergyCondition
 public import PhyslibAlpha.Relativity.General.PerfectFluidEnergyConditions
 public import PhyslibAlpha.Relativity.General.PointwiseCausality
 public import PhyslibAlpha.Relativity.General.Schwarzschild.IncompressibleSphere
