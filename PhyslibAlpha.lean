@@ -822,6 +822,7 @@ public import PhyslibAlpha.Relativity.General.PointwiseCausality
 public import PhyslibAlpha.Relativity.General.Schwarzschild.IncompressibleSphere
 public import PhyslibAlpha.Relativity.General.Schwarzschild.Metric
 public import PhyslibAlpha.Relativity.General.Schwarzschild.Vacuum
+public import PhyslibAlpha.Relativity.General.TimeFunctions
 public import PhyslibAlpha.Relativity.IsLorentzDeriv
 public import PhyslibAlpha.Relativity.LorentzGroup.Basic
 public import PhyslibAlpha.Relativity.LorentzGroup.Boosts.Axis
