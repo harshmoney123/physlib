@@ -75,15 +75,15 @@ structure IsTimeOrientationOn (g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) �
 
 /-- A future-directed timelike curve on `[a, b]`: a timelike curve whose tangent `v` satisfies
 `g (X (γ t)) v < 0`. -/
-def IsFutureTimelikeCurveOn (g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ) (X : (Fin 4 → ℝ) → Fin 4 → ℝ)
-    (U : Set (Fin 4 → ℝ)) (γ : ℝ → Fin 4 → ℝ) (a b : ℝ) : Prop :=
+def IsFutureTimelikeCurveOn (g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ)
+    (X : (Fin 4 → ℝ) → Fin 4 → ℝ) (U : Set (Fin 4 → ℝ)) (γ : ℝ → Fin 4 → ℝ) (a b : ℝ) : Prop :=
   IsTimelikeCurveOn g U γ a b ∧
     ∀ t ∈ Icc a b, Matrix.toBilin' (g (γ t)) (X (γ t)) (derivWithin γ (Icc a b) t) < 0
 
 /-- A future-directed causal curve on `[a, b]`: a causal curve whose tangent `v` satisfies
 `g (X (γ t)) v < 0`. -/
-def IsFutureCausalCurveOn (g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ) (X : (Fin 4 → ℝ) → Fin 4 → ℝ)
-    (U : Set (Fin 4 → ℝ)) (γ : ℝ → Fin 4 → ℝ) (a b : ℝ) : Prop :=
+def IsFutureCausalCurveOn (g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ)
+    (X : (Fin 4 → ℝ) → Fin 4 → ℝ) (U : Set (Fin 4 → ℝ)) (γ : ℝ → Fin 4 → ℝ) (a b : ℝ) : Prop :=
   IsCausalCurveOn g U γ a b ∧
     ∀ t ∈ Icc a b, Matrix.toBilin' (g (γ t)) (X (γ t)) (derivWithin γ (Icc a b) t) < 0
 

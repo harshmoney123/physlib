@@ -99,7 +99,8 @@ lemma derivWithin_Icc_of_subset {γ : ℝ → Fin 4 → ℝ} {a b c d t : ℝ}
     (hγ : ContDiffOn ℝ 1 γ (Icc a b)) (hac : a ≤ c) (hdb : d ≤ b) (hcd : c < d)
     (ht : t ∈ Icc c d) : derivWithin γ (Icc c d) t = derivWithin γ (Icc a b) t := by
   have hsub : Icc c d ⊆ Icc a b := Icc_subset_Icc hac hdb
-  have hdiff : DifferentiableWithinAt ℝ γ (Icc a b) t := (hγ.differentiableOn one_ne_zero) t (hsub ht)
+  have hdiff : DifferentiableWithinAt ℝ γ (Icc a b) t :=
+    (hγ.differentiableOn one_ne_zero) t (hsub ht)
   exact (hdiff.hasDerivWithinAt.mono hsub).derivWithin (uniqueDiffOn_Icc hcd t ht)
 
 /-- The restriction of a timelike curve to a subinterval is a timelike curve. -/
