@@ -191,7 +191,8 @@ lemma coordDeriv_comm (hf : ContDiffAt ℝ ∞ f x) (b d : Fin 4) :
   have hd : DifferentiableAt ℝ (fderiv ℝ f) x :=
     (hf.fderiv_right (m := 1) (by simp)).differentiableAt (by simp)
   simp only [coordDeriv]
-  rw [fderiv_clm_apply hd (differentiableAt_const _), fderiv_clm_apply hd (differentiableAt_const _)]
+  rw [fderiv_clm_apply hd (differentiableAt_const _),
+    fderiv_clm_apply hd (differentiableAt_const _)]
   simp [hs.eq (Pi.single b 1) (Pi.single d 1)]
 
 end Calculus
@@ -253,7 +254,8 @@ lemma inverseMetricDeriv_eq (hg : IsLorentzianMetricOn g U) (hx : x ∈ U) (d : 
     inverseMetricDeriv g x d = -((g x)⁻¹ * metricDeriv g x d * (g x)⁻¹) := by
   have key : metricDeriv g x d * (g x)⁻¹ + g x * inverseMetricDeriv g x d = 0 := by
     ext p e
-    have hev : (fun y => ∑ q, g y p q * (g y)⁻¹ q e) =ᶠ[nhds x] fun _ => (1 : Matrix _ _ ℝ) p e := by
+    have hev : (fun y => ∑ q, g y p q * (g y)⁻¹ q e) =ᶠ[nhds x]
+        fun _ => (1 : Matrix _ _ ℝ) p e := by
       filter_upwards [hg.isOpen.mem_nhds hx] with y hy
       have := Matrix.mul_nonsing_inv _ (isUnit_iff_ne_zero.mpr (hg.det_ne_zero hy))
       simpa [Matrix.mul_apply] using congrFun (congrFun this p) e
@@ -264,7 +266,8 @@ lemma inverseMetricDeriv_eq (hg : IsLorentzianMetricOn g U) (hx : x ∈ U) (d : 
     simp only [coordDeriv_mul ((hg.contDiffAt hx p _).differentiableAt (by simp))
       (hg.differentiableAt_inv hx _ e), Finset.sum_add_distrib] at h0
     simpa [Matrix.mul_apply, metricDeriv, inverseMetricDeriv] using h0
-  have hl : (g x)⁻¹ * g x = 1 := Matrix.nonsing_inv_mul _ (isUnit_iff_ne_zero.mpr (hg.det_ne_zero hx))
+  have hl : (g x)⁻¹ * g x = 1 :=
+    Matrix.nonsing_inv_mul _ (isUnit_iff_ne_zero.mpr (hg.det_ne_zero hx))
   have h1 : inverseMetricDeriv g x d = (g x)⁻¹ * (g x * inverseMetricDeriv g x d) := by
     rw [← Matrix.mul_assoc, hl, Matrix.one_mul]
   rw [h1, eq_neg_of_add_eq_zero_right key, Matrix.mul_neg, Matrix.mul_assoc]
