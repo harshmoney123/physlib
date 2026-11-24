@@ -10,6 +10,43 @@ public import Mathlib.Analysis.Calculus.Deriv.Pow
 public import PhyslibAlpha.Relativity.General.Curvature
 public import PhyslibAlpha.Relativity.General.Godel.Metric
 
+/-!
+
+# Christoffel symbols of the Gödel metric
+
+The inverse of the Gödel metric and the closed forms of its Christoffel symbols and their
+derivatives.
+
+## i. Overview
+
+The Gödel metric depends only on the radius `r`, so its inverse, its coordinate derivatives and
+its Christoffel symbols are explicit functions of `sinh r` and `cosh r`. Only `Γ^r_{tφ}`,
+`Γ^r_{φφ}`, `Γ^t_{tr}`, `Γ^t_{rφ}`, `Γ^φ_{tr}`, `Γ^φ_{rφ}` and the ones related by symmetry are
+non-zero (`godelGamma`). We prove that `godelGamma` is the Christoffel symbol of `godelMetric`
+away from the axis (`christoffel_godelMetric`) and give its `r`-derivative (`godelGamma'`,
+`hasDerivAt_godelGamma`), which is the input needed to compute the Ricci tensor.
+
+## ii. Key results
+
+- `godelMetricInvR`, `godelMetric_inv` : the inverse metric.
+- `coordDeriv_godelMetric` : only the `r`-derivatives of the metric are non-zero.
+- `godelGamma`, `christoffel_godelMetric` : the Christoffel symbols in closed form.
+- `godelGamma'`, `hasDerivAt_godelGamma` : their derivatives with respect to `r`.
+
+## iii. Table of contents
+
+- A. The inverse metric
+- B. Derivatives of the metric
+- C. The Christoffel symbols
+- D. Derivatives of the Christoffel symbols
+
+## iv. References
+
+- K. Gödel, *An example of a new type of cosmological solutions of Einstein's field equations of
+  gravitation*, Rev. Mod. Phys. 21, 447 (1949).
+
+-/
+
 @[expose] public section
 
 noncomputable section
@@ -18,6 +55,12 @@ namespace GeneralRelativity
 
 open Real
 
+/-!
+
+## A. The inverse metric
+
+-/
+
 /-- The inverse of the Gödel metric at radius `r`. -/
 def godelMetricInvR (r : ℝ) : Matrix (Fin 4) (Fin 4) ℝ :=
   !![(sinh r ^ 2 - 1) / cosh r ^ 2, 0, -(√2 / cosh r ^ 2), 0;
@@ -25,7 +68,9 @@ def godelMetricInvR (r : ℝ) : Matrix (Fin 4) (Fin 4) ℝ :=
     -(√2 / cosh r ^ 2), 0, 1 / (sinh r ^ 2 * cosh r ^ 2), 0;
     0, 0, 0, 1]
 
-lemma godelMetricR_inv {r : ℝ} (hr : 0 < r) : (godelMetricR r)⁻¹ = godelMetricInvR r := by
+/-- The inverse of the Gödel metric away from the axis. -/
+lemma godelMetricR_inv {r : ℝ} (hr : 0 < r) :
+    (godelMetricR r)⁻¹ = godelMetricInvR r := by
   have hs : sinh r ≠ 0 := (sinh_pos_iff.2 hr).ne'
   have hc : cosh r ≠ 0 := (cosh_pos r).ne'
   have h2 : √2 ^ 2 = 2 := Real.sq_sqrt (by norm_num)
@@ -37,6 +82,12 @@ lemma godelMetricR_inv {r : ℝ} (hr : 0 < r) : (godelMetricR r)⁻¹ = godelMet
     field_simp
   all_goals first | ring1 | (rw [h2]; linarith)
 
+/-!
+
+## B. Derivatives of the metric
+
+-/
+
 /-- The `r`-derivative of `godelMetricR`. -/
 def godelMetricR' (r : ℝ) : Matrix (Fin 4) (Fin 4) ℝ :=
   !![0, 0, -(√2 * (2 * sinh r * cosh r)), 0;
@@ -44,15 +95,19 @@ def godelMetricR' (r : ℝ) : Matrix (Fin 4) (Fin 4) ℝ :=
     -(√2 * (2 * sinh r * cosh r)), 0, 2 * sinh r * cosh r - 4 * sinh r ^ 3 * cosh r, 0;
     0, 0, 0, 0]
 
-lemma hasDerivAt_sinh_sq (r : ℝ) : HasDerivAt (fun r : ℝ => sinh r ^ 2) (2 * sinh r * cosh r) r := by
+/-- The derivative of `sinh² r` is `2 sinh r cosh r`. -/
+lemma hasDerivAt_sinh_sq (r : ℝ) :
+    HasDerivAt (fun r : ℝ => sinh r ^ 2) (2 * sinh r * cosh r) r := by
   have h : HasDerivAt sinh (cosh r) r := Real.hasDerivAt_sinh r
   simpa [mul_assoc] using h.fun_pow 2
 
+/-- The derivative of `sinh⁴ r` is `4 sinh³ r cosh r`. -/
 lemma hasDerivAt_sinh_pow_four (r : ℝ) :
     HasDerivAt (fun r : ℝ => sinh r ^ 4) (4 * sinh r ^ 3 * cosh r) r := by
   have h : HasDerivAt sinh (cosh r) r := Real.hasDerivAt_sinh r
   simpa [mul_assoc] using h.fun_pow 4
 
+/-- `godelMetricR'` is the `r`-derivative of `godelMetricR`, entry by entry. -/
 lemma hasDerivAt_godelMetricR (r : ℝ) (p q : Fin 4) :
     HasDerivAt (fun r => godelMetricR r p q) (godelMetricR' r p q) r := by
   fin_cases p <;> fin_cases q <;> simp [godelMetricR, godelMetricR'] <;>
@@ -61,6 +116,7 @@ lemma hasDerivAt_godelMetricR (r : ℝ) (p q : Fin 4) :
     | exact ((hasDerivAt_sinh_sq r).const_mul _).neg
     | exact (hasDerivAt_sinh_sq r).sub (hasDerivAt_sinh_pow_four r)
 
+/-- The inverse of the Gödel metric field away from the axis. -/
 lemma godelMetric_inv {y : Fin 4 → ℝ} (hy : y ∈ godelDomain) :
     (godelMetric y)⁻¹ = godelMetricInvR (y 1) :=
   godelMetricR_inv hy
@@ -74,6 +130,12 @@ lemma coordDeriv_godelMetric (x : Fin 4 → ℝ) (p q b : Fin 4) :
     h.differentiableAt b
   rw [h.deriv] at this
   exact this
+
+/-!
+
+## C. The Christoffel symbols
+
+-/
 
 /-- The Christoffel symbol `Γ^a_{bc}` of the Gödel metric as a function of `r`. -/
 def godelGamma (a b c : Fin 4) (r : ℝ) : ℝ :=
@@ -114,10 +176,17 @@ def godelGamma' (a b c : Fin 4) (r : ℝ) : ℝ :=
     -((cosh r ^ 2 + sinh r ^ 2) / (sinh r * cosh r) ^ 2)
   else 0
 
+/-!
+
+## D. Derivatives of the Christoffel symbols
+
+-/
+
 section Derivatives
 
 variable {r : ℝ}
 
+/-- The derivative of `sinh r cosh r` is `cosh² r + sinh² r`. -/
 lemma hasDerivAt_sinh_mul_cosh (r : ℝ) :
     HasDerivAt (fun r : ℝ => sinh r * cosh r) (cosh r ^ 2 + sinh r ^ 2) r := by
   have h1 : HasDerivAt sinh (cosh r) r := Real.hasDerivAt_sinh r
@@ -125,6 +194,7 @@ lemma hasDerivAt_sinh_mul_cosh (r : ℝ) :
   convert h1.mul h2 using 1
   ring
 
+/-- `godelGamma'` is the `r`-derivative of `godelGamma`, away from the axis. -/
 lemma hasDerivAt_godelGamma (hs : sinh r ≠ 0) (hc : cosh r ≠ 0) (a b c : Fin 4) :
     HasDerivAt (godelGamma a b c) (godelGamma' a b c r) r := by
   have h1 : HasDerivAt sinh (cosh r) r := Real.hasDerivAt_sinh r

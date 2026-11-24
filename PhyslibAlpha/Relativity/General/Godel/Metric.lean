@@ -74,9 +74,11 @@ def godelMetric : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ :=
 /-- The region `r > 0` away from the axis, on which the cylindrical coordinates are regular. -/
 def godelDomain : Set (Fin 4 → ℝ) := {y | 0 < y 1}
 
+/-- The region away from the axis is open. -/
 lemma isOpen_godelDomain : IsOpen godelDomain :=
   isOpen_lt continuous_const (continuous_apply 1)
 
+/-- The real hyperbolic sine is smooth. -/
 lemma contDiff_sinh_real {n : WithTop ℕ∞} : ContDiff ℝ n (sinh : ℝ → ℝ) := by
   have h : (sinh : ℝ → ℝ) = fun x => (exp x - exp (-x)) / 2 := funext Real.sinh_eq
   rw [h]
