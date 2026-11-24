@@ -41,6 +41,8 @@ convention, so `-⟪·, ·⟫ₘ` is Lorentzian (`isLorentzian_minkowski`).
 - `IsLorentzian.isFutureTimelike_add` : the sum of future-directed timelike vectors is
   future-directed timelike.
 - `IsLorentzian.isFutureCausal_add` : the same for future-directed causal vectors.
+- `IsLorentzian.isFutureCausal_or_isPastCausal`, `IsLorentzian.isPastCausal_iff_neg` : every causal vector is
+  future- or past-directed, and past-directed means negative of future-directed.
 - `isLorentzian_minkowski` : the Minkowski metric is Lorentzian.
 
 ## iii. Table of contents
@@ -367,6 +369,21 @@ lemma isFutureTimelike_add (hg : IsLorentzian g) {o : TimeOrientation g} {u v : 
   have h1 : g u u < 0 := hu.1
   have h2 : g v v < 0 := hv.1
   linarith
+
+/-- A vector is past-directed causal iff its negative is future-directed causal. -/
+lemma isPastCausal_iff_neg {o : TimeOrientation g} {v : V} :
+    IsPastCausal o v ↔ IsFutureCausal o (-v) := by
+  have hc : IsCausal g (-v) ↔ IsCausal g v := by simp [IsCausal]
+  simp [IsPastCausal, IsFutureCausal, hc]
+
+/-- A causal vector is either future-directed or past-directed. -/
+lemma isFutureCausal_or_isPastCausal (hg : IsLorentzian g) (o : TimeOrientation g) {v : V}
+    (hv : IsCausal g v) : IsFutureCausal o v ∨ IsPastCausal o v := by
+  have hne : g o.T v ≠ 0 := fun h =>
+    absurd (hg.isSpacelike_of_orthogonal o.isTimelike hv.2 h) (not_lt.mpr hv.1)
+  rcases lt_or_gt_of_ne hne with h | h
+  · exact .inl ⟨hv, h⟩
+  · exact .inr ⟨hv, h⟩
 
 /-- A timelike vector or its negative is future-directed timelike. -/
 lemma isFutureTimelike_or_neg (hg : IsLorentzian g) (o : TimeOrientation g) {v : V}
