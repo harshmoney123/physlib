@@ -222,7 +222,8 @@ private lemma dominant_aux {ρ p c2 P G : ℝ} (hc : 0 < c2) (hp : |p| ≤ ρ * 
   by_contra hneg
   push Not at hneg
   rcases le_total 0 p with h0 | h0
-  · nlinarith [mul_nonneg h0 (show 0 ≤ c2 * G + 2 * P by linarith), mul_nonneg hP (sub_nonneg.mpr h2)]
+  · nlinarith [mul_nonneg h0 (show 0 ≤ c2 * G + 2 * P by linarith),
+      mul_nonneg hP (sub_nonneg.mpr h2)]
   · have : 0 ≤ (ρ + p / c2) := by
       have : 0 ≤ (ρ + p / c2) * c2 := by rw [hac]; linarith
       exact nonneg_of_mul_nonneg_left this hc
@@ -401,7 +402,8 @@ lemma weakEnergyCondition_stressEnergy_iff (hg : IsLorentzian g) (hx : g x x = -
 energy condition of the cosmic fluid. -/
 lemma dominantEnergyCondition_stressEnergy_iff (hg : IsLorentzian g) (hx : g x x = -(c : ℝ) ^ 2)
     (he : ∃ e, e ≠ 0 ∧ g x e = 0) {o : TimeOrientation g} (hxo : IsFutureTimelike o x) :
-    GeneralRelativity.DominantEnergyCondition o (F.stressEnergy g x c t) ↔ F.DominantEnergyCondition c t :=
+    GeneralRelativity.DominantEnergyCondition o (F.stressEnergy g x c t) ↔
+      F.DominantEnergyCondition c t :=
   dominantEnergyCondition_perfectFluid_iff hg hx he hxo
 
 /-- The strong energy condition of the stress-energy tensor of a cosmic fluid in four dimensions

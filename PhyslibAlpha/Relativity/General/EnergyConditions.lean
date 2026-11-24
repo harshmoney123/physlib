@@ -22,7 +22,8 @@ positivity conditions on `T` against vectors of a given causal character:
 
 - null: `T k k ≥ 0` for every null vector `k`;
 - weak: `T u u ≥ 0` for every timelike vector `u`;
-- dominant: `T u v ≥ 0` for all future-directed causal vectors `u`, `v`.
+- dominant: `T u v ≥ 0` for all future-directed causal vectors `u`, `v`;
+- strong: `(T_{ab} - T g_{ab} / (n - 2)) u^a u^b ≥ 0` for every timelike `u`.
 
 ## ii. Key results
 
@@ -31,12 +32,15 @@ positivity conditions on `T` against vectors of a given causal character:
   non-negative on null vectors.
 - `WeakEnergyCondition.nullEnergyCondition` : the weak condition implies the null condition.
 - `DominantEnergyCondition.weakEnergyCondition` : the dominant condition implies the weak one.
+- `StrongEnergyCondition` : the strong condition, using the trace `traceForm` with respect to `g`;
+  `StrongEnergyCondition.nullEnergyCondition` shows that it implies the null condition.
 
 ## iii. Table of contents
 
 - A. The energy conditions
 - B. Non-negativity on null vectors by continuity
 - C. Implications between the energy conditions
+- D. The strong energy condition
 
 ## iv. References
 
