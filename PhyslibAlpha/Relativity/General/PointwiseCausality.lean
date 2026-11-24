@@ -40,6 +40,7 @@ convention, so `-⟪·, ·⟫ₘ` is Lorentzian (`isLorentzian_minkowski`).
 - `IsLorentzian.mul_self_le_sq_of_isTimelike` : reversed Cauchy-Schwarz for timelike vectors.
 - `IsLorentzian.isFutureTimelike_add` : the sum of future-directed timelike vectors is
   future-directed timelike.
+- `IsLorentzian.isFutureCausal_add` : the same for future-directed causal vectors.
 - `isLorentzian_minkowski` : the Minkowski metric is Lorentzian.
 
 ## iii. Table of contents
@@ -277,9 +278,11 @@ lemma IsFutureTimelike.isFutureCausal {o : TimeOrientation g} {v : V}
 
 namespace IsLorentzian
 
-/-- Two future-directed timelike vectors have negative product. -/
-lemma g_neg_of_isFutureTimelike (hg : IsLorentzian g) {o : TimeOrientation g} {u v : V}
-    (hu : IsFutureTimelike o u) (hv : IsFutureTimelike o v) : g u v < 0 := by
+/-- Two future-directed causal vectors have non-positive product, and a negative one if the
+first is timelike. -/
+private lemma g_nonpos_aux (hg : IsLorentzian g) {o : TimeOrientation g} {u v : V}
+    (hu : IsFutureCausal o u) (hv : IsFutureCausal o v) :
+    g u v ≤ 0 ∧ (IsTimelike g u → g u v < 0) := by
   set T := o.T
   have hT := o.isTimelike
   have hTT : g T T < 0 := hT
@@ -311,16 +314,47 @@ lemma g_neg_of_isFutureTimelike (hg : IsLorentzian g) {o : TimeOrientation g} {u
   have hxx := hg.nonneg_of_orthogonal hT hx
   have hyy := hg.nonneg_of_orthogonal hT hy
   have hcs := hg.sq_le_of_orthogonal hT hx hy
-  have hu' : g x x < -(a * a * g T T) := by have := hu.1; unfold IsTimelike at this; linarith
-  have hv' : g y y < -(b * b * g T T) := by have := hv.1; unfold IsTimelike at this; linarith
-  have hprod : g x x * g y y < (-(a * a * g T T)) * (-(b * b * g T T)) :=
-    mul_lt_mul'' hu' hv' hxx hyy
-  have hsq : g x y ^ 2 < (-(a * b * g T T)) ^ 2 := by nlinarith
-  have hpos : 0 ≤ -(a * b * g T T) := by
-    have := mul_pos ha hb
-    nlinarith
-  have := (abs_lt.mp (abs_lt_of_sq_lt_sq hsq hpos)).2
-  rw [huv]
+  have hA : 0 < -(a * a * g T T) := by nlinarith [mul_pos ha ha]
+  have hB : 0 < -(b * b * g T T) := by nlinarith [mul_pos hb hb]
+  have hu' : g x x ≤ -(a * a * g T T) := by have := hu.1.1; linarith
+  have hv' : g y y ≤ -(b * b * g T T) := by have := hv.1.1; linarith
+  have hprod : g x y ^ 2 ≤ (-(a * a * g T T)) * (-(b * b * g T T)) :=
+    hcs.trans (mul_le_mul hu' hv' hyy hA.le)
+  have hpos : 0 ≤ -(a * b * g T T) := by nlinarith [mul_pos ha hb]
+  have hsq : g x y ^ 2 ≤ (-(a * b * g T T)) ^ 2 := by nlinarith
+  refine ⟨?_, fun hut => ?_⟩
+  · have := (abs_le.mp (abs_le_of_sq_le_sq hsq hpos)).2
+    rw [huv]
+    linarith
+  · have hu'' : g x x < -(a * a * g T T) := by
+      have : g u u < 0 := hut
+      linarith
+    have hlt : g x x * g y y < (-(a * a * g T T)) * (-(b * b * g T T)) :=
+      lt_of_le_of_lt (mul_le_mul_of_nonneg_left hv' hxx) (mul_lt_mul_of_pos_right hu'' hB)
+    have hsq' : g x y ^ 2 < (-(a * b * g T T)) ^ 2 := by nlinarith
+    have := (abs_lt.mp (abs_lt_of_sq_lt_sq hsq' hpos)).2
+    rw [huv]
+    linarith
+
+/-- Two future-directed timelike vectors have negative product. -/
+lemma g_neg_of_isFutureTimelike (hg : IsLorentzian g) {o : TimeOrientation g} {u v : V}
+    (hu : IsFutureTimelike o u) (hv : IsFutureTimelike o v) : g u v < 0 :=
+  (g_nonpos_aux hg hu.isFutureCausal hv.isFutureCausal).2 hu.1
+
+/-- Two future-directed causal vectors have non-positive product. -/
+lemma g_nonpos_of_isFutureCausal (hg : IsLorentzian g) {o : TimeOrientation g} {u v : V}
+    (hu : IsFutureCausal o u) (hv : IsFutureCausal o v) : g u v ≤ 0 :=
+  (g_nonpos_aux hg hu hv).1
+
+/-- The sum of two future-directed causal vectors is future-directed causal. -/
+lemma isFutureCausal_add (hg : IsLorentzian g) {o : TimeOrientation g} {u v : V}
+    (hu : IsFutureCausal o u) (hv : IsFutureCausal o v) : IsFutureCausal o (u + v) := by
+  have hT : g o.T (u + v) < 0 := by simp only [map_add]; linarith [hu.2, hv.2]
+  refine ⟨⟨?_, fun h => by simp [h] at hT⟩, hT⟩
+  have := hg.g_nonpos_of_isFutureCausal hu hv
+  simp only [map_add, LinearMap.add_apply, hg.symm v u]
+  have h1 : g u u ≤ 0 := hu.1.1
+  have h2 : g v v ≤ 0 := hv.1.1
   linarith
 
 /-- The sum of two future-directed timelike vectors is future-directed timelike. -/
