@@ -810,6 +810,7 @@ public import PhyslibAlpha.Relativity.Fermions.Weyl.MetricPairing
 public import PhyslibAlpha.Relativity.Fermions.Weyl.Tensorial
 public import PhyslibAlpha.Relativity.Fermions.Weyl.Unit
 public import PhyslibAlpha.Relativity.General.CausalCurves
+public import PhyslibAlpha.Relativity.General.ChronologyRelations
 public import PhyslibAlpha.Relativity.General.CoordinateMetric
 public import PhyslibAlpha.Relativity.General.Curvature
 public import PhyslibAlpha.Relativity.General.EnergyConditions

@@ -40,6 +40,7 @@ is a closed timelike curve (`exists_isTimelikeLoopMod_cylinder`).
 - `IsTimelikeCurveOn`, `IsCausalCurveOn` : timelike and causal curves.
 - `IsTimelikeLoopMod`, `IsClosedTimelikeCurve` : closed timelike curves, possibly modulo a period.
 - `IsTimelikeCurveOn.isCausalCurveOn` : a timelike curve is causal.
+- `IsTimelikeCurveOn.mono`, `IsCausalCurveOn.mono` : restriction to a subinterval.
 - `time_ne_of_isCausalCurveOn_minkowskiField` : time is strictly monotone along causal curves
   in Minkowski space.
 - `not_isClosedCausalCurve_minkowskiField` : Minkowski space has no closed causal curve, hence
@@ -92,6 +93,32 @@ lemma IsTimelikeCurveOn.isCausalCurveOn {g : (Fin 4 → ℝ) → Matrix (Fin 4) 
     {U : Set (Fin 4 → ℝ)} {γ : ℝ → Fin 4 → ℝ} {a b : ℝ} (h : IsTimelikeCurveOn g U γ a b) :
     IsCausalCurveOn g U γ a b :=
   ⟨h.1, h.2.1, h.2.2.1, fun t ht => (h.2.2.2 t ht).isCausal⟩
+
+/-- Restricting `γ` to a subinterval does not change its derivative within the interval. -/
+lemma derivWithin_Icc_of_subset {γ : ℝ → Fin 4 → ℝ} {a b c d t : ℝ}
+    (hγ : ContDiffOn ℝ 1 γ (Icc a b)) (hac : a ≤ c) (hdb : d ≤ b) (hcd : c < d)
+    (ht : t ∈ Icc c d) : derivWithin γ (Icc c d) t = derivWithin γ (Icc a b) t := by
+  have hsub : Icc c d ⊆ Icc a b := Icc_subset_Icc hac hdb
+  have hdiff : DifferentiableWithinAt ℝ γ (Icc a b) t := (hγ.differentiableOn one_ne_zero) t (hsub ht)
+  exact (hdiff.hasDerivWithinAt.mono hsub).derivWithin (uniqueDiffOn_Icc hcd t ht)
+
+/-- The restriction of a timelike curve to a subinterval is a timelike curve. -/
+lemma IsTimelikeCurveOn.mono {g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ}
+    {U : Set (Fin 4 → ℝ)} {γ : ℝ → Fin 4 → ℝ} {a b c d : ℝ} (h : IsTimelikeCurveOn g U γ a b)
+    (hac : a ≤ c) (hdb : d ≤ b) (hcd : c < d) : IsTimelikeCurveOn g U γ c d :=
+  ⟨hcd, h.2.1.mono (Icc_subset_Icc hac hdb), fun t ht => h.2.2.1 t (Icc_subset_Icc hac hdb ht),
+    fun t ht => by
+      rw [derivWithin_Icc_of_subset h.2.1 hac hdb hcd ht]
+      exact h.2.2.2 t (Icc_subset_Icc hac hdb ht)⟩
+
+/-- The restriction of a causal curve to a subinterval is a causal curve. -/
+lemma IsCausalCurveOn.mono {g : (Fin 4 → ℝ) → Matrix (Fin 4) (Fin 4) ℝ}
+    {U : Set (Fin 4 → ℝ)} {γ : ℝ → Fin 4 → ℝ} {a b c d : ℝ} (h : IsCausalCurveOn g U γ a b)
+    (hac : a ≤ c) (hdb : d ≤ b) (hcd : c < d) : IsCausalCurveOn g U γ c d :=
+  ⟨hcd, h.2.1.mono (Icc_subset_Icc hac hdb), fun t ht => h.2.2.1 t (Icc_subset_Icc hac hdb ht),
+    fun t ht => by
+      rw [derivWithin_Icc_of_subset h.2.1 hac hdb hcd ht]
+      exact h.2.2.2 t (Icc_subset_Icc hac hdb ht)⟩
 
 /-!
 
