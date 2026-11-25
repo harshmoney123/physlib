@@ -221,15 +221,15 @@ lemma ricci_godel_dust_cosmological {a G : ℝ} (ha : 0 < a) (hG : G ≠ 0) (c :
 
 /-- The cosmological constant fluid of the Gödel universe, with the density and pressure of
 `Cosmology.FLRW.FriedmannEquation.cosmologicalConstantDensity` and
-`Cosmology.FLRW.FriedmannEquation.cosmologicalConstantPressure`, has density `-ρ / 2`, where `ρ` is the
-density of the dust. -/
+`Cosmology.FLRW.FriedmannEquation.cosmologicalConstantPressure`, has density `-ρ / 2`, where `ρ` is
+the density of the dust. -/
 lemma cosmologicalConstantDensity_godel {a G : ℝ} (ha : 0 < a) (hG : G ≠ 0) (c : SpeedOfLight) :
     Cosmology.FLRW.FriedmannEquation.cosmologicalConstantDensity (godelCosmologicalConstant a) G c
       = -(godelDensity G c a / 2) := by
   have ha0 : a ≠ 0 := ha.ne'
   have hπ := Real.pi_ne_zero
-  simp only [Cosmology.FLRW.FriedmannEquation.cosmologicalConstantDensity, godelCosmologicalConstant,
-    godelDensity]
+  simp only [Cosmology.FLRW.FriedmannEquation.cosmologicalConstantDensity,
+    godelCosmologicalConstant, godelDensity]
   field_simp
 
 /-- Einstein's equations of the Gödel universe as an equation of tensors: `G_{ab}` is
@@ -241,8 +241,10 @@ theorem einstein_godelMetric_fluid {a G : ℝ} (ha : 0 < a) (hG : G ≠ 0) (c : 
       (perfectFluid (Matrix.toBilin' (godelMetric a c x)) (Pi.single 0 1) (godelDensity G c a) 0 c
           (Pi.single i 1) (Pi.single j 1)
         + perfectFluid (Matrix.toBilin' (godelMetric a c x)) (Pi.single 0 1)
-          (Cosmology.FLRW.FriedmannEquation.cosmologicalConstantDensity (godelCosmologicalConstant a) G c)
-          (Cosmology.FLRW.FriedmannEquation.cosmologicalConstantPressure (godelCosmologicalConstant a) G c) c
+          (Cosmology.FLRW.FriedmannEquation.cosmologicalConstantDensity
+            (godelCosmologicalConstant a) G c)
+          (Cosmology.FLRW.FriedmannEquation.cosmologicalConstantPressure
+            (godelCosmologicalConstant a) G c) c
           (Pi.single i 1) (Pi.single j 1)) := by
   have hc0 : (c : ℝ) ≠ 0 := c.val_pos.ne'
   have ha0 : a ≠ 0 := ha.ne'

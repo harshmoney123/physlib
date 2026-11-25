@@ -162,7 +162,8 @@ lemma isLorentzianMetricOn_godelMetric {a : ℝ} (ha : 0 < a) (c : SpeedOfLight)
         nlinarith [sq_nonneg (v 2), sq_nonneg (v 3), mul_nonneg hp.le (sq_nonneg (v 2)),
           mul_pos ha2 this]
       · have := sq_pos_of_ne_zero h'
-        nlinarith [sq_nonneg (v 1), sq_nonneg (v 3), mul_pos hp this, mul_nonneg ha2.le (sq_nonneg (v 1))]
+        nlinarith [sq_nonneg (v 1), sq_nonneg (v 3), mul_pos hp this,
+          mul_nonneg ha2.le (sq_nonneg (v 1))]
       · have := sq_pos_of_ne_zero h'
         nlinarith [sq_nonneg (v 1), sq_nonneg (v 2), mul_nonneg hp.le (sq_nonneg (v 2)),
           mul_nonneg ha2.le (sq_nonneg (v 1))]
