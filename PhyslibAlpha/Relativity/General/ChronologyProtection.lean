@@ -334,7 +334,10 @@ lemma isFutureTimelikeCurveOn_godelCircle {t₀ r₀ z₀ : ℝ} (h : godelCriti
   rw [(hasDerivAt_godelCircle t₀ r₀ z₀ s).hasDerivWithinAt.derivWithin hu]
   have hr : 0 < r₀ := godelCriticalRadius_pos.trans h
   simp only [godelMetric_bilin, godelTimeField, godelCircle]
-  simp
+  simp only [Fin.isValue, Pi.single_eq_same, Matrix.cons_val_zero, mul_zero, neg_zero, ne_eq,
+    one_ne_zero, not_false_eq_true, Pi.single_eq_of_ne, Matrix.cons_val_one, add_zero,
+    Fin.reduceEq, Matrix.cons_val, mul_one, zero_sub, Left.neg_neg_iff, sqrt_pos, Nat.ofNat_pos,
+    mul_pos_iff_of_pos_left, gt_iff_lt]
   positivity
 
 /-- The Gödel universe violates chronology: a point on a circle beyond the critical radius lies
