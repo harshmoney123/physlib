@@ -6,6 +6,7 @@ Authors: Harsha Vankayalapati
 module
 
 public import Mathlib.Analysis.SpecialFunctions.Arsinh
+public import Physlib.Relativity.SpeedOfLight
 public import PhyslibAlpha.Relativity.General.CausalCurves
 public import PhyslibAlpha.Relativity.General.Godel.Metric
 
@@ -19,12 +20,13 @@ curves.
 ## i. Overview
 
 The tangent vector `∂_φ` of the circle `φ ↦ (t₀, r₀, φ, z₀)` has norm
-`g_{φφ} = sinh² r₀ (1 - sinh² r₀)`, which is negative exactly when `sinh r₀ > 1`, that is
+`g_{φφ} = 4a² sinh² r₀ (sinh² r₀ - 1)`, which is positive, that is timelike in the signature
+`(+,-,-,-)`, exactly when `sinh r₀ > 1`, that is
 `r₀ > r_c = arsinh 1 = ln (1 + √2)`. In the cylindrical coordinates `φ` is periodic with period
 `2 π`, so the circle is a timelike loop modulo the period `(0, 0, 2 π, 0)`
 (`isTimelikeLoopMod_godelCircle`): a closed timelike curve of Gödel's universe. Gödel's universe
-therefore violates causality: it is the first spacetime in this library in which a particle can
-travel into its own past.
+therefore violates causality, and unlike the flat cylinder it solves Einstein's equations with
+dust and a cosmological constant (`PhyslibAlpha.Relativity.General.Godel.Einstein`).
 
 ## ii. Key results
 
@@ -110,8 +112,10 @@ lemma hasDerivAt_godelCircle (t₀ r₀ z₀ s : ℝ) :
 
 /-- Beyond the critical radius the circle of constant `t`, `r`, `z` is a timelike loop modulo
 the angular period. -/
-lemma isTimelikeLoopMod_godelCircle {t₀ r₀ z₀ : ℝ} (h : godelCriticalRadius < r₀) :
-    IsTimelikeLoopMod godelMetric godelDomain godelPeriod (godelCircle t₀ r₀ z₀) 0 (2 * π) := by
+lemma isTimelikeLoopMod_godelCircle {a : ℝ} (ha : 0 < a) (c : SpeedOfLight) {t₀ r₀ z₀ : ℝ}
+    (h : godelCriticalRadius < r₀) :
+    IsTimelikeLoopMod (godelMetric a c) godelDomain godelPeriod (godelCircle t₀ r₀ z₀) 0
+      (2 * π) := by
   have hr : 0 < r₀ := godelCriticalRadius_pos.trans h
   have h1 := one_lt_sinh_of_godelCriticalRadius_lt h
   refine ⟨⟨by positivity, ?_, fun s _ => ?_, fun s hs => ?_⟩, ?_⟩
@@ -122,16 +126,17 @@ lemma isTimelikeLoopMod_godelCircle {t₀ r₀ z₀ : ℝ} (h : godelCriticalRad
     rw [(hasDerivAt_godelCircle t₀ r₀ z₀ s).hasDerivWithinAt.derivWithin hu]
     simp only [IsTimelike, godelMetric_bilin]
     simp [godelCircle]
-    nlinarith [sq_nonneg (sinh r₀), mul_pos (by positivity : (0 : ℝ) < sinh r₀ ^ 2)
-      (by nlinarith : (0 : ℝ) < sinh r₀ ^ 2 - 1)]
+    have hs : (0 : ℝ) < sinh r₀ ^ 2 - 1 := by nlinarith
+    have : 0 < 4 * a ^ 2 * (sinh r₀ ^ 2 * (sinh r₀ ^ 2 - 1)) := by positivity
+    nlinarith
   · funext i
     fin_cases i <;> simp [godelCircle, godelPeriod]
 
 /-- The Gödel universe has a closed timelike curve: Gödel's universe violates causality. -/
-theorem exists_isTimelikeLoopMod_godel :
-    ∃ (γ : ℝ → Fin 4 → ℝ) (a b : ℝ),
-      IsTimelikeLoopMod godelMetric godelDomain godelPeriod γ a b :=
+theorem exists_isTimelikeLoopMod_godel {a : ℝ} (ha : 0 < a) (c : SpeedOfLight) :
+    ∃ (γ : ℝ → Fin 4 → ℝ) (s₀ s₁ : ℝ),
+      IsTimelikeLoopMod (godelMetric a c) godelDomain godelPeriod γ s₀ s₁ :=
   ⟨godelCircle 0 (godelCriticalRadius + 1) 0, 0, 2 * π,
-    isTimelikeLoopMod_godelCircle (by linarith)⟩
+    isTimelikeLoopMod_godelCircle ha c (by linarith)⟩
 
 end GeneralRelativity
